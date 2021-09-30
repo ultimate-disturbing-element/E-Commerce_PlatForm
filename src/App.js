@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { Products, Navbar,Cart } from "./components";
+import { Products, Navbar, Cart,Checkout } from "./components";
 import { commerce } from "./lib/commerce";
-import {BrowserRouter as Router ,Switch,Route} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState({});
@@ -15,42 +15,54 @@ function App() {
     fetchCart();
   }, []);
 
-  const handleAddToCart = async (productId,quantity)=> {
-    const {cart} = await commerce.cart.add(productId,quantity);
+  const handleAddToCart = async (productId, quantity) => {
+    const { cart } = await commerce.cart.add(productId, quantity);
 
     setCart(cart);
-  }
+  };
   const fetchCart = async () => {
     setCart(await commerce.cart.retrieve());
   };
-  
-  const handleUpdateCartQty = async (productId,quantity) => {
-    const {cart} = await commerce.cart.update(productId,{quantity});
 
-    setCart(cart)
-  }
-
-  const handleRemoveFromCart = async (productId) => {
-    const {cart} = await commerce.cart.remove(productId);
+  const handleUpdateCartQty = async (productId, quantity) => {
+    const { cart } = await commerce.cart.update(productId, { quantity });
 
     setCart(cart);
-  }
-  
+  };
+
+  const handleRemoveFromCart = async (productId) => {
+    const { cart } = await commerce.cart.remove(productId);
+
+    setCart(cart);
+  };
+
+  const handelEmptyCart = async () => {
+    const { cart } = await commerce.cart.empty();
+
+    setCart(cart);
+  };
+
   return (
     <Router>
-    <div>
-      <Navbar totalItems={cart.total_items}/>
-      <Switch>
-        <Route exact path="/">
-        <Products products={products} onAddToCart={handleAddToCart}/>
-        </Route>
-      <Route exact path="/cart">
-      <Cart cart={cart}/>
-      </Route>
-    
-      </Switch>
-    
-    </div>
+      <div>
+        <Navbar totalItems={cart.total_items} />
+        <Switch>
+          <Route exact path="/">
+            <Products products={products} onAddToCart={handleAddToCart} />
+          </Route>
+          <Route exact path="/cart">
+            <Cart
+              cart={cart}
+              handelEmptyCart={handelEmptyCart}
+              handleUpdateCartQty={handleUpdateCartQty}
+              handleRemoveFromCart={handleRemoveFromCart}
+            />
+          </Route>
+          <Route exact path="/checkout">
+            <Checkout cart={cart}/>
+          </Route>
+        </Switch>
+      </div>
     </Router>
   );
 }
